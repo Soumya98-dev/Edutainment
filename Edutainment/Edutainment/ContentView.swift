@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+struct Question {
+    let text: String
+    let answer: Int
+}
+
 struct SettingsView: View {
     @Binding var maxTable: Int
     @Binding var questionCount: Int
@@ -40,7 +45,10 @@ struct ContentView: View {
     @State private var isGameActive = false
     @State private var maxTable = 12
     @State private var questionCount = 5
-
+    @State private var questions = [Question]()
+    @State private var currentQuestionIndex = 0
+    @State private var score = 0
+    
     var body: some View {
         if isGameActive {
             Text("Game screen")
@@ -51,6 +59,19 @@ struct ContentView: View {
                     isGameActive = true
                 })
         }
+    }
+
+    func generateQuestions(upTo maxTable: Int, count: Int) -> [Question] {
+        var questions = [Question]()
+        for _ in 1...count {
+            let num1 = Int.random(in: 2...maxTable)
+            let num2 = Int.random(in: 2...maxTable)
+            let questionText = "What is \(num1) * \(num2)?"
+            let answer = num1 * num2
+            questions.append(Question(text: questionText, answer: answer))
+        }
+
+        return questions
     }
 }
 
