@@ -48,7 +48,7 @@ struct ContentView: View {
     @State private var questions = [Question]()
     @State private var currentQuestionIndex = 0
     @State private var score = 0
-    
+
     var body: some View {
         if isGameActive {
             Text("Game screen")
@@ -56,7 +56,7 @@ struct ContentView: View {
             SettingsView(
                 maxTable: $maxTable, questionCount: $questionCount,
                 startGame: {
-                    isGameActive = true
+                    startGame()
                 })
         }
     }
@@ -69,9 +69,24 @@ struct ContentView: View {
             let questionText = "What is \(num1) * \(num2)?"
             let answer = num1 * num2
             questions.append(Question(text: questionText, answer: answer))
-        }
 
+        }
         return questions
+    }
+
+    func startGame() {
+        questions = generateQuestions(upTo: maxTable, count: questionCount)
+        print(questions)
+        isGameActive = true
+    }
+}
+
+struct GameView: View {
+    let questions: [Question]
+    var body: some View {
+        VStack {
+
+        }
     }
 }
 
