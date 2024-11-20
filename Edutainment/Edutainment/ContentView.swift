@@ -45,18 +45,34 @@ struct ContentView: View {
     @State private var isGameActive = false
     @State private var maxTable = 12
     @State private var questionCount = 5
-    @State private var questions = [Question]()
-    @State private var currentQuestionIndex = 0
-    @State private var score = 0
+    @State private var questions: [Question] = []
+    @State private var currentQuestionIndex: Int = 0
+    @State private var score: Int = 0
+    @State private var userAnswer: String = ""
 
     var body: some View {
         if isGameActive {
             Text("Game screen")
+            GameView(
+                questions: questions,
+                currentQuestionIndex: $currentQuestionIndex,
+                score: $score,
+                userAnswer: $userAnswer,
+                onGameOver: {
+                    isGameActive = false
+                }
+            )
         } else {
             SettingsView(
                 maxTable: $maxTable, questionCount: $questionCount,
                 startGame: {
-                    startGame()
+                    questions = generateQuestions(
+                        upTo: maxTable, count: questionCount)
+                    currentQuestionIndex = 0
+                    score = 0
+                    userAnswer = ""
+                    isGameActive = true
+
                 })
         }
     }
@@ -83,12 +99,56 @@ struct ContentView: View {
 
 struct GameView: View {
     let questions: [Question]
+    @Binding var currentQuestionIndex: Int
+    @Binding var score: Int
+    @Binding var userAnswer: String
+
+    var onGameOver: () -> Void
+
     var body: some View {
         VStack {
+            Text("Question \(questions[currentQuestionIndex].text)")
+                .font(.title)
+                .padding()
+            TextField("Enter your answer", text: $userAnswer)
+                .keyboardType(.numberPad)
+                .textFieldStyle(.roundedBorder)
+                .padding()
+            Button("Submit answer") {
+                checkAnswer()
+            }
+            .buttonStyle(.borderedProminent)
+            .padding()
 
+            Text("Score: \(score)")
+                .font(.headline)
+                .padding()
+
+            Spacer()
+
+        }
+        .padding()
+    }
+
+    private func checkAnswer() {
+        if let userAnswerInt = Int(userAnswer),
+            userAnswerInt == questions[currentQuestionIndex].answer
+        {
+            score = score + 1
+        }
+
+        userAnswer = ""
+
+        if currentQuestionIndex < questions.count - 1 {
+            currentQuestionIndex = currentQuestionIndex + 1
+        } else {
+            onGameOver()
         }
     }
 }
+
+
+
 
 #Preview {
     ContentView()
